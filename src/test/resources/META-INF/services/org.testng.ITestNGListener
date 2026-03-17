@@ -1,0 +1,5 @@
+# Listeners are now only coming from the Maven Surefire configuration in pom.xml.
+# Uncomment the entries below if you want to switch back to ServiceLoader registration.
+# io.qameta.allure.testng.AllureTestNg
+# org.selenium.pom.listeners.TestListener
+# org.selenium.pom.listeners.RetryListener

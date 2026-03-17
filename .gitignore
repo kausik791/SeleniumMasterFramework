@@ -1,0 +1,22 @@
+# Build output
+target/
+out/
+
+# IDE
+.idea/
+*.iml
+
+# Allure local cache
+.allure/
+
+# Runtime artifacts
+scr/
+target/screenshots/
+target/logs/
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# OS files
+.DS_Store
+Thumbs.db

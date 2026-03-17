@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Assertion failures",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Assertion.*"
+  },
+  {
+    "name": "UI element not found",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(NoSuchElementException|TimeoutException|ElementNotInteractableException).*"
+  },
+  {
+    "name": "Stale element errors",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*StaleElementReferenceException.*"
+  },
+  {
+    "name": "Network or API errors",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(HTTP Status Code|502|503|504).*"
+  },
+  {
+    "name": "Flaky tests",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(flaky|intermittent|retry).*"
+  }
+]
