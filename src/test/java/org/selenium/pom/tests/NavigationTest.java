@@ -26,6 +26,6 @@ public class NavigationTest  extends BaseTest {
                 load().
                 getMyHeader().
                 navigateToStoreUsingMenu();
-        Assert.assertEquals(storePage.getTitle(), "Store25");
+        Assert.assertEquals(storePage.getTitle(), "Store35");
     }
 }
