@@ -1,5 +1,6 @@
 package org.selenium.pom.base;
 
+import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import io.restassured.http.Cookies;
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class BaseTest {
         //localBrowser= System.getProperty("FIREFOX",browser); //using cmd,vm,testng, but won't work with rightclick test class run unless vm is set because in BaseTest @Parameters("browser")
         //localBrowser = System.getProperty("browser",browser); //using cmd,vm,testng, but won't work with rightclick test class run unless vm is set because in BaseTest @Parameters("browser")
         //setDriver(new DriverManager().initializeDriver(localBrowser)); // when using orginal DriverManager class
+
+        Allure.parameter("Browser", localBrowser);
         setDriver(DriverManagerFactory.getManager(DriverType.valueOf(localBrowser)).createDriver());
         logger.info("Thread START: {}, DRIVER: {}", Thread.currentThread().getId(), getDriver());
     }

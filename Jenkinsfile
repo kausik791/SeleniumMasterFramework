@@ -1,8 +1,9 @@
 pipeline {
     agent any
-     options {
-            skipDefaultCheckout(true)   //  IMPORTANT
-        }
+
+    options {
+        skipDefaultCheckout(true)
+    }
 
     tools {
         maven 'Maven'
@@ -18,18 +19,35 @@ pipeline {
             }
         }
 
+        stage('Clean Workspace') {
+            steps {
+                bat 'mvn clean'
+            }
+        }
+
         stage('Run Tests - Parallel Browsers') {
             parallel {
 
                 stage('Chrome Tests') {
                     steps {
-                        bat 'mvn clean test -Dbrowser=CHROME -Dallure.results.directory=target/allure-results-chrome'
+                        // Run tests
+                        bat 'mvn test -Dbrowser=CHROME -Dallure.results.directory=target/allure-results-chrome'
+
+                        // Add environment info for Allure
+                        writeFile file: 'target/allure-results-chrome/environment.properties',
+                                  text: 'Browser=Chrome\nEnv=QA\n'
+
                     }
                 }
 
                 stage('Firefox Tests') {
                     steps {
-                        bat 'mvn clean test -Dbrowser=FIREFOX -Dallure.results.directory=target/allure-results-firefox'
+                        // Run tests
+                        bat 'mvn test -Dbrowser=FIREFOX -Dallure.results.directory=target/allure-results-firefox'
+
+                        // Add environment info for Allure
+                        writeFile file: 'target/allure-results-firefox/environment.properties',
+                                  text: 'Browser=Firefox\nEnv=QA\n'
                     }
                 }
             }
@@ -38,7 +56,7 @@ pipeline {
 
     post {
         always {
-            echo 'Generating Allure Report...'
+            echo 'Generating Merged Allure Report...'
 
             allure includeProperties: false,
                    jdk: '',
