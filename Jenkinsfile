@@ -1,5 +1,8 @@
 pipeline {
     agent any
+     options {
+            skipDefaultCheckout(true)   //  IMPORTANT
+        }
 
     tools {
         maven 'Maven'
