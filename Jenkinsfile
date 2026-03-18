@@ -10,7 +10,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/kausik791/SeleniumMasterFramework.git'
+                deleteDir()
+                checkout scm
             }
         }
 
