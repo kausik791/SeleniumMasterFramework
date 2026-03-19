@@ -14,6 +14,7 @@
             <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
 <!--            <suiteFile>testng.xml</suiteFile>-->
             <aspectj.version>1.9.25.1</aspectj.version>
+
             <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
         </properties>
 
@@ -36,11 +37,15 @@
                             <value>io.qameta.allure.testng.AllureTestNg,org.selenium.pom.listeners.TestListener,org.selenium.pom.listeners.RetryListener</value>
                         </property>
                     </properties>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${allure.results.directory}</allure.results.directory>
+                    </systemPropertyVariables>
                     <!--<parallel>methods</parallel>-->
                     <!--may add the threadCount parameter if the default of 5 is not sufficient-->
 <!--                    <threadCount>10</threadCount>-->
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                        -Dallure.results.directory=${allure.results.directory}
                     </argLine>
                 </configuration>
                 <dependencies>
