@@ -36,7 +36,7 @@ public class BaseTest {
     @BeforeMethod
     public synchronized void  startDriver(@Optional String browser)//@Optional will mark this parameter from the testng file as optional parameterso that we can hard code it as well
     {
-        String localBrowser = "";
+       /* String localBrowser = "";
         //localBrowser = System.getProperty("browser");// for running from cmd or vm, cmd always take prcedence if both are there
         //localBrowser=browser; // it's for testng.xml but  If VM option is already set then it will take precedence, so we have to delete vm options first to use browser from testng.xml
         if(browser !=null){
@@ -47,6 +47,20 @@ public class BaseTest {
         //localBrowser= System.getProperty("FIREFOX",browser); //using cmd,vm,testng, but won't work with rightclick test class run unless vm is set because in BaseTest @Parameters("browser")
         //localBrowser = System.getProperty("browser",browser); //using cmd,vm,testng, but won't work with rightclick test class run unless vm is set because in BaseTest @Parameters("browser")
         //setDriver(new DriverManager().initializeDriver(localBrowser)); // when using orginal DriverManager class
+*/
+        String localBrowser;
+
+        String sysBrowser = System.getProperty("browser");
+        if (sysBrowser != null && !sysBrowser.isEmpty()) {
+            // System property / VM option takes priority (for local runs via command line)
+            localBrowser = sysBrowser;
+        } else if (browser != null && !browser.isEmpty()) {
+            // TestNG XML parameter takes priority next (for Jenkins Option A)
+            localBrowser = browser;
+        } else {
+            // Final fallback
+            localBrowser = "CHROME";
+        }
 
         Allure.parameter("Browser", localBrowser);
         setDriver(DriverManagerFactory.getManager(DriverType.valueOf(localBrowser)).createDriver());
