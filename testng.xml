@@ -7,10 +7,10 @@
             <package name="org.selenium.pom.tests"/>
         </packages>
     </test>
-    <test name="Regression-FireFox" thread-count="2" parallel="methods">
+    <test name="Regression-Firefox" thread-count="2" parallel="methods">
         <parameter name="browser" value="FIREFOX"/>
-        <classes>
-            <class name="org.selenium.pom.tests.MyFirstTestCase"/>
-        </classes>
+        <packages>
+            <package name="org.selenium.pom.tests"/>
+        </packages>
     </test>
 </suite>
