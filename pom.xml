@@ -14,7 +14,7 @@
             <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
 <!--            <suiteFile>testng.xml</suiteFile>-->
             <aspectj.version>1.9.25.1</aspectj.version>
-
+            <browser>CHROME</browser>
             <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
         </properties>
 
@@ -38,6 +38,7 @@
                         </property>
                     </properties>
                     <systemPropertyVariables>
+                        <browser>${browser}</browser>
                         <allure.results.directory>${allure.results.directory}</allure.results.directory>
                     </systemPropertyVariables>
                     <!--<parallel>methods</parallel>-->
@@ -45,7 +46,8 @@
 <!--                    <threadCount>10</threadCount>-->
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
-
+                        -Dallure.results.directory=${allure.results.directory}
+                        -Dbrowser=${browser}
                     </argLine>
                 </configuration>
                 <dependencies>
