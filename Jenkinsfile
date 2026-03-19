@@ -30,24 +30,19 @@ pipeline {
 
                 stage('Chrome Tests') {
                     steps {
-                        // Run tests
-                        bat 'mvn test -Dbrowser=CHROME -Dallure.results.directory=target/allure-results-chrome'
-
-                        // Add environment info for Allure
+                        bat 'if not exist target\\allure-results-chrome mkdir target\\allure-results-chrome'
                         writeFile file: 'target/allure-results-chrome/environment.properties',
-                                  text: 'Browser=Chrome\nEnv=QA\n'
-
+                                  text: 'Browser=Chrome\nEnv=QA\nOS=Windows\n'
+                        bat 'mvn test -Dbrowser=CHROME -Dallure.results.directory=target/allure-results-chrome'
                     }
                 }
 
                 stage('Firefox Tests') {
                     steps {
-                        // Run tests
-                        bat 'mvn test -Dbrowser=FIREFOX -Dallure.results.directory=target/allure-results-firefox'
-
-                        // Add environment info for Allure
+                        bat 'if not exist target\\allure-results-firefox mkdir target\\allure-results-firefox'
                         writeFile file: 'target/allure-results-firefox/environment.properties',
-                                  text: 'Browser=Firefox\nEnv=QA\n'
+                                  text: 'Browser=Firefox\nEnv=QA\nOS=Windows\n'
+                        bat 'mvn test -Dbrowser=FIREFOX -Dallure.results.directory=target/allure-results-firefox'
                     }
                 }
             }
@@ -57,12 +52,14 @@ pipeline {
     post {
         always {
             echo 'Generating Merged Allure Report...'
+            bat 'if not exist target\\allure-results-merged mkdir target\\allure-results-merged'
+            bat 'xcopy /Y /S target\\allure-results-chrome\\* target\\allure-results-merged\\'
+            bat 'xcopy /Y /S target\\allure-results-firefox\\* target\\allure-results-merged\\'
 
-            allure includeProperties: false,
+            allure includeProperties: true,
                    jdk: '',
                    results: [
-                       [path: 'target/allure-results-chrome'],
-                       [path: 'target/allure-results-firefox']
+                       [path: 'target/allure-results-merged']
                    ]
         }
     }
