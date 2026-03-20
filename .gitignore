@@ -21,4 +21,4 @@ replay_pid*.log
 .DS_Store
 Thumbs.db
 
-Drivers/
+Drivers/resolution.properties

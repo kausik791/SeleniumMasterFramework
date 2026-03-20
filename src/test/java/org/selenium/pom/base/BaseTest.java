@@ -63,6 +63,7 @@ public class BaseTest {
         }
 
         Allure.parameter("Browser", localBrowser);
+        Allure.label("browser", localBrowser);
         setDriver(DriverManagerFactory.getManager(DriverType.valueOf(localBrowser)).createDriver());
         logger.info("Thread START: {}, DRIVER: {}", Thread.currentThread().getId(), getDriver());
     }
@@ -102,6 +103,8 @@ public class BaseTest {
         props.setProperty("os", System.getProperty("os.name"));
         props.setProperty("java.version", System.getProperty("java.version"));
         props.setProperty("env", System.getProperty("env", "local"));
+        props.setProperty("buildNumber", System.getenv("BUILD_NUMBER"));
+        props.setProperty("jobName", System.getenv("JOB_NAME"));
         File envFile = new File(resultsDir, "environment.properties");
         try (OutputStream os = new FileOutputStream(envFile)) {
             props.store(os, null);
