@@ -4,4 +4,4 @@
 - ## Agent Instructions
 
 When analyzing project structure:
-suggest which should be included in gitignore file and which should be included in the repository.
+suggest if have to use remotedriver for selenium grid with docker then what i have to do,keeping in mind local set up should not be affected
