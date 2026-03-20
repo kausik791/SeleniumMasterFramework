@@ -1,3 +1,4 @@
+/*
 
 pipeline {
     agent any
@@ -50,3 +51,88 @@ pipeline {
 
 
 
+ */
+
+ pipeline {
+     agent any
+
+     options {
+         skipDefaultCheckout(true)
+     }
+
+     tools {
+         maven 'Maven'
+         jdk 'JDK21'
+     }
+
+     stages {
+
+         stage('Checkout') {
+             steps {
+                 deleteDir()
+                 checkout scm
+             }
+         }
+
+         stage('Start Selenium Grid') {
+             steps {
+                 echo 'Starting Selenium Grid...'
+                 bat 'docker compose up -d'
+             }
+         }
+
+         stage('Wait for Grid') {
+             steps {
+                 echo 'Waiting for Grid to be ready...'
+                 bat 'timeout /t 15'
+             }
+         }
+
+         stage('Clean Workspace') {
+             steps {
+                 bat 'mvn clean'
+             }
+         }
+
+         stage('Run Tests (Grid + Parallel)') {
+             steps {
+                 // Ensure Allure folder exists
+                 bat 'if not exist target\\allure-results mkdir target\\allure-results'
+
+                 // Environment details for Allure
+                 writeFile file: 'target/allure-results/environment.properties',
+                           text: '''Execution=Grid
+ Browsers=Chrome+Firefox
+ Env=QA
+ '''
+
+                 // Run tests (TestNG handles Chrome + Firefox parallel)
+                 bat 'mvn test -Dgrid=true'
+             }
+         }
+     }
+
+     post {
+
+         always {
+             echo 'Generating Allure Report...'
+
+             allure includeProperties: true,
+                    jdk: '',
+                    results: [[path: 'target/allure-results']]
+         }
+
+         always {
+             echo 'Stopping Selenium Grid...'
+             bat 'docker compose down'
+         }
+
+         success {
+             echo 'All tests passed!'
+         }
+
+         failure {
+             echo 'Some tests failed. Check Allure report for details.'
+         }
+     }
+ }

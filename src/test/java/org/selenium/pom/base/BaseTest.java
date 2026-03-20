@@ -64,7 +64,13 @@ public class BaseTest {
 
         Allure.parameter("Browser", localBrowser);
         Allure.label("browser", localBrowser);
-        setDriver(DriverManagerFactory.getManager(DriverType.valueOf(localBrowser)).createDriver());
+        String grid = System.getProperty("grid", "false");
+        boolean useGrid = "true".equalsIgnoreCase(grid);
+        if (useGrid) {
+            setDriver(DriverManagerFactory.getRemoteManager(DriverType.valueOf(localBrowser)).createDriver());
+        } else {
+            setDriver(DriverManagerFactory.getManager(DriverType.valueOf(localBrowser)).createDriver());
+        }
         logger.info("Thread START: {}, DRIVER: {}", Thread.currentThread().getId(), getDriver());
     }
 

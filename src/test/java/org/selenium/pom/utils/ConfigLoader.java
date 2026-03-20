@@ -51,4 +51,12 @@ public class ConfigLoader {
         if(prop != null) return prop;
         else throw new RuntimeException("property email is not specified in the stg_config.properties file");
     }
+
+    public String getGridUrl() {
+        String prop = properties.getProperty("gridUrl");
+        if (prop != null && !prop.trim().isEmpty()) {
+            return prop.trim();
+        }
+        return System.getProperty("gridUrl", "http://localhost:4444");
+    }
 }

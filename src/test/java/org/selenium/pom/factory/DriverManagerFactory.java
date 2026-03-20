@@ -14,4 +14,8 @@ public class DriverManagerFactory {
         }
 
     }
+
+    public static DriverManager getRemoteManager(DriverType driverType) {
+        return new RemoteDriverManager(driverType);
+    }
 }
