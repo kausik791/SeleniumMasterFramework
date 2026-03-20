@@ -84,7 +84,7 @@ pipeline {
          stage('Wait for Grid') {
              steps {
                  echo 'Waiting for Grid to be ready...'
-                 bat 'timeout /t 15 /nobreak'
+                 sleep time: 15, unit: 'SECONDS'
              }
          }
 
@@ -97,8 +97,13 @@ pipeline {
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
+
                  writeFile file: 'target/allure-results/environment.properties',
-                           text: 'Execution=Grid\nBrowsers=Chrome+Firefox\nEnv=QA\n'
+                           text: '''Execution=Grid
+ Browsers=Chrome+Firefox
+ Env=QA
+ '''
+
                  bat 'mvn test -Dgrid=true'
              }
          }
@@ -107,6 +112,7 @@ pipeline {
      post {
          always {
              echo 'Generating Allure Report...'
+
              allure includeProperties: true,
                     jdk: '',
                     results: [[path: 'target/allure-results']]
@@ -114,9 +120,11 @@ pipeline {
              echo 'Stopping Selenium Grid...'
              bat 'docker compose down'
          }
+
          success {
              echo 'All tests passed!'
          }
+
          failure {
              echo 'Some tests failed. Check Allure report for details.'
          }
