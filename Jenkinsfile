@@ -84,7 +84,7 @@ pipeline {
          stage('Wait for Grid') {
              steps {
                  echo 'Waiting for Grid to be ready...'
-                 bat 'timeout /t 15'
+                 bat 'timeout /t 15 /nobreak'
              }
          }
 
