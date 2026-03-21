@@ -58,6 +58,7 @@ pipeline {
 
      options {
          skipDefaultCheckout(true)
+         timeout(time: 20, unit: 'MINUTES')
      }
 
      tools {
@@ -77,14 +78,30 @@ pipeline {
          stage('Start Selenium Grid') {
              steps {
                  echo 'Starting Selenium Grid...'
-                 bat 'docker compose up -d'
+                 bat 'docker compose up -d --scale chrome=2 --scale firefox=2'
              }
          }
 
          stage('Wait for Grid') {
              steps {
-                 echo 'Waiting for Grid to be ready...'
-                 sleep time: 15, unit: 'SECONDS'
+                 echo 'Waiting for Selenium Grid...'
+                 script {
+                     int retries = 10
+                     for (int i = 0; i < retries; i++) {
+                         def status = bat(
+                             script: 'curl -s http://localhost:4444/status',
+                             returnStdout: true
+                         ).trim()
+
+                         if (status.contains('"ready":true')) {
+                             echo 'Grid is ready!'
+                             break
+                         }
+
+                         echo 'Grid not ready yet... retrying'
+                         sleep 5
+                     }
+                 }
              }
          }
 
@@ -97,13 +114,6 @@ pipeline {
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-
-                 writeFile file: 'target/allure-results/environment.properties',
-                           text: '''Execution=Grid
- Browsers=Chrome+Firefox
- Env=QA
- '''
-
                  bat 'mvn test -Dgrid=true'
              }
          }
@@ -118,7 +128,7 @@ pipeline {
                     results: [[path: 'target/allure-results']]
 
              echo 'Stopping Selenium Grid...'
-             bat 'docker compose down'
+             bat 'docker compose down || exit 0'
          }
 
          success {

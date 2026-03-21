@@ -90,8 +90,12 @@ public class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public synchronized void quitDriver() {
-        logger.info("Thread END: {}, DRIVER: {}", Thread.currentThread().getId(), getDriver());
-        getDriver().quit();
+        if (getDriver() != null) {
+            logger.info("Thread END: {}, DRIVER: {}", Thread.currentThread().getId(), getDriver());
+            getDriver().quit();
+        } else {
+            logger.warn("Thread END: {}, DRIVER was null — skipping quit", Thread.currentThread().getId());
+        }
     }
     @Step("Inject API cookies into browser")
     public void injectCookiesToBrowser(Cookies cookies){

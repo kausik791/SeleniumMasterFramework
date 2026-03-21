@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Automation Suite" verbose="1" thread-count="2" parallel="tests" >
-    <test name="Regression-Chrome" thread-count="2" parallel="methods">
+
+<suite name="Automation Suite" parallel="tests" thread-count="3">
+
+    <test name="Regression-Chrome">
         <parameter name="browser" value="CHROME"/>
         <packages>
             <package name="org.selenium.pom.tests"/>
         </packages>
     </test>
-    <test name="Regression-Firefox" thread-count="2" parallel="methods">
+
+    <test name="Regression-Firefox">
         <parameter name="browser" value="FIREFOX"/>
         <packages>
             <package name="org.selenium.pom.tests"/>
         </packages>
     </test>
+
 </suite>
