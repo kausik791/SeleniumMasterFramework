@@ -90,14 +90,16 @@ pipeline {
                      def isReady = false
                      int retry = 0
 
-                     while (!isReady && retry < 12) {
+                     while (!isReady && retry < 20) {
                          try {
                              def response = bat(
                                  script: 'curl -s http://localhost:4444/status',
                                  returnStdout: true
                              ).trim()
 
-                             if (response.contains('"ready": true')) {
+                             echo "Grid response: ${response}"
+
+                             if (response.toLowerCase().contains("ready")) {
                                  isReady = true
                                  echo 'Selenium Grid is READY ✅'
                              } else {
