@@ -84,22 +84,37 @@ pipeline {
 
          stage('Wait for Grid') {
              steps {
-                 echo 'Waiting for Selenium Grid...'
+                 echo 'Waiting for Selenium Grid to be ready...'
+
                  script {
-                     int retries = 10
-                     for (int i = 0; i < retries; i++) {
-                         def status = bat(
-                             script: 'curl -s http://localhost:4444/status',
-                             returnStdout: true
-                         ).trim()
+                     def isReady = false
+                     int retry = 0
 
-                         if (status.contains('"ready":true')) {
-                             echo 'Grid is ready!'
-                             break
+                     while (!isReady && retry < 12) {
+                         try {
+                             def response = bat(
+                                 script: 'curl -s http://localhost:4444/status',
+                                 returnStdout: true
+                             ).trim()
+
+                             if (response.contains('"ready": true')) {
+                                 isReady = true
+                                 echo 'Selenium Grid is READY ✅'
+                             } else {
+                                 echo "Grid not ready yet... retry ${retry}"
+                                 sleep time: 5, unit: 'SECONDS'
+                                 retry++
+                             }
+
+                         } catch (Exception e) {
+                             echo "Grid not reachable yet... retry ${retry}"
+                             sleep time: 5, unit: 'SECONDS'
+                             retry++
                          }
+                     }
 
-                         echo 'Grid not ready yet... retrying'
-                         sleep 5
+                     if (!isReady) {
+                         error("❌ Selenium Grid did not become ready in time")
                      }
                  }
              }
