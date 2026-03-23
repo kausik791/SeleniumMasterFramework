@@ -78,7 +78,9 @@ pipeline {
          stage('Start Selenium Grid') {
              steps {
                  echo 'Starting Selenium Grid...'
-                 bat 'docker compose down || exit 0'
+                 bat 'docker compose down --timeout 5 || exit 0'
+                 bat 'docker rm -f selenium-hub javaseleniumpipeline-chrome-1 javaseleniumpipeline-chrome-2 javaseleniumpipeline-firefox-1 javaseleniumpipeline-firefox-2 || exit 0'
+                 bat 'docker network rm javaseleniumpipeline_selenium-grid || exit 0'
                  bat 'docker compose up -d --scale chrome=2 --scale firefox=2'
              }
          }
@@ -87,7 +89,7 @@ pipeline {
              steps {
                  echo 'Waiting for Selenium Grid to be ready...'
                  script {
-                     int maxRetries = 36   // ~6 minutes (36 * 10s)
+                     int maxRetries = 36
                      int retry = 0
                      boolean ready = false
 
@@ -132,7 +134,7 @@ pipeline {
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-                 bat 'docker run --rm --network selenium-grid -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
+                 bat 'docker run --rm --network javaseleniumpipeline_selenium-grid -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
              }
          }
      }
@@ -145,7 +147,9 @@ pipeline {
                     results: [[path: 'target/allure-results']]
 
              echo 'Stopping Selenium Grid...'
-             bat 'docker compose down || exit 0'
+             bat 'docker compose down --timeout 5 || exit 0'
+             bat 'docker rm -f selenium-hub javaseleniumpipeline-chrome-1 javaseleniumpipeline-chrome-2 javaseleniumpipeline-firefox-1 javaseleniumpipeline-firefox-2 || exit 0'
+             bat 'docker network rm javaseleniumpipeline_selenium-grid || exit 0'
          }
 
          success {
