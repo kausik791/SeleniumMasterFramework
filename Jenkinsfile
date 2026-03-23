@@ -95,10 +95,11 @@ pipeline {
                          int status = bat(
                              returnStatus: true,
                              script: '''
-powershell -NoProfile -Command ^
-"$ErrorActionPreference='Stop'; ^
-$logs = docker compose logs selenium-hub --tail=200 | Out-String; ^
-if (($logs -match 'Started Selenium Hub') -and ($logs -match 'from DOWN to UP')) { exit 0 } else { exit 1 }"
+docker compose logs selenium-hub --tail=200 | findstr /C:"Started Selenium Hub" >nul
+if errorlevel 1 exit /b 1
+docker compose logs selenium-hub --tail=200 | findstr /C:"from DOWN to UP" >nul
+if errorlevel 1 exit /b 1
+exit /b 0
 '''
                          )
 
