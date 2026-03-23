@@ -16,6 +16,10 @@
             <aspectj.version>1.9.25.1</aspectj.version>
 
             <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+            <!-- ADD THESE 3 for seleniumgrid-->
+            <grid>false</grid>
+            <gridUrl>http://localhost:4444</gridUrl>
+            <env>STAGE</env>
         </properties>
 
     <build>
@@ -40,6 +44,11 @@
                     <systemPropertyVariables>
 
                         <allure.results.directory>${allure.results.directory}</allure.results.directory>
+
+                        <!-- ADD THESE 3 -->
+                        <grid>${grid}</grid>
+                        <gridUrl>${gridUrl}</gridUrl>
+                        <env>${env}</env>
                     </systemPropertyVariables>
                     <!--<parallel>methods</parallel>-->
                     <!--may add the threadCount parameter if the default of 5 is not sufficient-->

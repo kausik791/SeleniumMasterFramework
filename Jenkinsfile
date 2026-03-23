@@ -132,16 +132,10 @@ pipeline {
              }
          }
 
-         stage('Clean Workspace') {
-             steps {
-                 bat 'mvn clean'
-             }
-         }
-
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-                 bat 'docker run --rm --network javaseleniumpipeline_selenium-grid -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
+                 bat 'mvn -B clean test -Dgrid=true'
              }
          }
      }

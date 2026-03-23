@@ -2,7 +2,7 @@ services:
   selenium-hub:
     image: selenium/hub:4.18.1
     container_name: selenium-hub
-    stop_grace_period: 5s        # ← Force kill after 5s
+    stop_grace_period: 5s
     ports:
       - "4444:4444"
       - "4442:4442"
@@ -13,7 +13,7 @@ services:
   chrome:
     image: selenium/node-chrome:4.18.1
     shm_size: 2gb
-    stop_grace_period: 5s        # ← Force kill after 5s
+    stop_grace_period: 5s
     depends_on:
       - selenium-hub
     environment:
@@ -28,7 +28,7 @@ services:
   firefox:
     image: selenium/node-firefox:4.18.1
     shm_size: 2gb
-    stop_grace_period: 5s        # ← Force kill after 5s
+    stop_grace_period: 5s
     depends_on:
       - selenium-hub
     environment:
