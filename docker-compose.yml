@@ -4,6 +4,10 @@ services:
     container_name: selenium-hub
     ports:
       - "4444:4444"
+      - "4442:4442"      # ← Event bus publish port (missing!)
+      - "4443:4443"      # ← Event bus subscribe port (missing!)
+    networks:
+      - selenium-grid
 
   chrome:
     image: selenium/node-chrome:4.18.1
@@ -16,6 +20,8 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=2
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    networks:
+      - selenium-grid   # ← Nodes must be on same network as hub!
 
   firefox:
     image: selenium/node-firefox:4.18.1
@@ -28,3 +34,9 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=2
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    networks:
+      - selenium-grid   # ← Nodes must be on same network as hub!
+
+networks:
+  selenium-grid:
+    driver: bridge

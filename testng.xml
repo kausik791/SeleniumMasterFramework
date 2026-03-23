@@ -19,7 +19,7 @@
     <test name="Regression-Chrome">
         <parameter name="browser" value="CHROME"/>
         <classes>
-            <class name="org.selenium.pom.tests.AddToCartTest"/>
+            <class name="org.selenium.pom.tests.SearchTest"/>
             <class name="org.selenium.pom.tests.CheckoutTest"/>
         </classes>
     </test>
@@ -27,7 +27,7 @@
     <test name="Regression-Firefox">
     <parameter name="browser" value="FIREFOX"/>
         <classes>
-            <class name="org.selenium.pom.tests.AddToCartTest"/>
+            <class name="org.selenium.pom.tests.SearchTest"/>
             <class name="org.selenium.pom.tests.CheckoutTest"/>
         </classes>
     </test>

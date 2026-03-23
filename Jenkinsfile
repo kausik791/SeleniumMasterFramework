@@ -95,12 +95,12 @@ pipeline {
                          int status = bat(
                              returnStatus: true,
                              script: '''
-docker compose logs selenium-hub --tail=200 | findstr /C:"Started Selenium Hub" >nul
-if errorlevel 1 exit /b 1
-docker compose logs selenium-hub --tail=200 | findstr /C:"from DOWN to UP" >nul
-if errorlevel 1 exit /b 1
-exit /b 0
-'''
+ docker compose logs selenium-hub --tail=200 | findstr /C:"Started Selenium Hub" >nul
+ if errorlevel 1 exit /b 1
+ docker compose logs selenium-hub --tail=200 | findstr /C:"from DOWN to UP" >nul
+ if errorlevel 1 exit /b 1
+ exit /b 0
+ '''
                          )
 
                          if (status == 0) {
@@ -132,7 +132,7 @@ exit /b 0
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-                 bat 'docker run --rm --network javaseleniumpipeline_default -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
+                 bat 'docker run --rm --network selenium-grid -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
              }
          }
      }
