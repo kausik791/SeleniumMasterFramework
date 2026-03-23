@@ -83,7 +83,7 @@ public class BaseTest {
             }
             writeAllureEnvironment(resultsDir);
             copyAllureCategories(resultsDir);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn("Failed to prepare Allure metadata", e);
         }
     }
@@ -108,13 +108,42 @@ public class BaseTest {
 
     private void writeAllureEnvironment(File resultsDir) throws IOException {
         Properties props = new Properties();
-        props.setProperty("baseUrl", ConfigLoader.getInstance().getBaseUrl());
-        props.setProperty("browser", System.getProperty("browser", "CHROME"));
-        props.setProperty("os", System.getProperty("os.name"));
-        props.setProperty("java.version", System.getProperty("java.version"));
-        props.setProperty("env", System.getProperty("env", "local"));
-        props.setProperty("buildNumber", System.getenv("BUILD_NUMBER"));
-        props.setProperty("jobName", System.getenv("JOB_NAME"));
+
+        // ConfigLoader can throw RuntimeException — wrap safely
+        try {
+            props.setProperty("baseUrl", ConfigLoader.getInstance().getBaseUrl());
+        } catch (Exception e) {
+            logger.warn("Could not load baseUrl for Allure environment: {}", e.getMessage());
+            props.setProperty("baseUrl", "not configured");
+        }
+
+        // Browser — smart detection based on how tests were triggered
+        String browserProp = System.getProperty("browser");
+        if (browserProp != null && !browserProp.isEmpty()) {
+            props.setProperty("browser", browserProp);
+        } else {
+            props.setProperty("browser", "CHROME, FIREFOX");
+        }
+
+        // Grid — shows if running on Selenium Grid or locally
+        String gridProp = System.getProperty("grid");
+        if ("true".equalsIgnoreCase(gridProp)) {
+            props.setProperty("execution", "Selenium Grid");
+        } else {
+            props.setProperty("execution", "Local");
+        }
+
+        // System properties — always use default to avoid null
+        props.setProperty("os",           System.getProperty("os.name",      "unknown"));
+        props.setProperty("java.version", System.getProperty("java.version", "unknown"));
+        props.setProperty("env",          System.getProperty("env",          "STAGE"));
+
+        // Jenkins environment variables — null locally, so use default
+        props.setProperty("buildNumber",  System.getenv("BUILD_NUMBER") != null
+                ? System.getenv("BUILD_NUMBER") : "local");
+        props.setProperty("jobName",      System.getenv("JOB_NAME") != null
+                ? System.getenv("JOB_NAME") : "local");
+
         File envFile = new File(resultsDir, "environment.properties");
         try (OutputStream os = new FileOutputStream(envFile)) {
             props.store(os, null);

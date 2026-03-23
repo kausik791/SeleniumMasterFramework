@@ -12,9 +12,12 @@ import org.selenium.pom.objects.User;
 
 public class CheckoutPage extends BasePage {
     private static final Logger logger = LoggerFactory.getLogger(CheckoutPage.class);
+
     public CheckoutPage(WebDriver driver) {
         super(driver);
+
     }
+
     private final By firstnameFld = By.id("billing_first_name");
     private final By lastNameFld = By.id("billing_last_name");
     private final By addressLineOneFld = By.id("billing_address_1");
@@ -35,12 +38,15 @@ public class CheckoutPage extends BasePage {
     private final By alternateCountryDropDown = By.id("select2-billing_country-container");
     private final By alternateStateDropDown = By.id("select2-billing_state-container");
     private final By directBankTransferRadioBtn = By.id("payment_method_bacs");
+    private final By cashOnDeliveryTransferRadioBtn = By.id("payment_method_cod");
     private final By productName = By.cssSelector("td[class='product-name']");
+
     @Step("Open checkout page")
-    public CheckoutPage load(){
+    public CheckoutPage load() {
         load("/checkout/");
         return this;
     }
+
     @Step("Enter first name: {firstName}")
     public CheckoutPage enterFirstName(String firstName) {
         //driver.findElement(firstnameFld).sendKeys(firstName);
@@ -49,6 +55,7 @@ public class CheckoutPage extends BasePage {
         firstNameElement.sendKeys(firstName);
         return this;
     }
+
     @Step("Enter last name: {lastName}")
     public CheckoutPage enterLastName(String lastName) {
         //driver.findElement(lastNameFld).sendKeys(lastName);
@@ -57,9 +64,10 @@ public class CheckoutPage extends BasePage {
         lastNameElement.sendKeys(lastName);
         return this;
     }
+
     @Step("Select country: {countryName}")
     public CheckoutPage selectCountry(String countryName) {
-       //Select select = new Select(driver.findElement(countryDropDown));
+        //Select select = new Select(driver.findElement(countryDropDown));
 /*        Select select = new Select(wait.until(ExpectedConditions.visibilityOfElementLocated(countryDropDown)));
         select.selectByVisibleText(countryName);*/
         wait.until(ExpectedConditions.elementToBeClickable(alternateCountryDropDown)).click();
@@ -69,14 +77,16 @@ public class CheckoutPage extends BasePage {
         e.click();
         return this;
     }
+
     @Step("Enter address line 1: {addressLineOne}")
-    public CheckoutPage enterAddressLineOne(String addressLineOne){
+    public CheckoutPage enterAddressLineOne(String addressLineOne) {
         //driver.findElement(addressLineOneFld).sendKeys(addressLineOne);
         WebElement addressLineOneElement = wait.until(ExpectedConditions.visibilityOfElementLocated(addressLineOneFld));
         addressLineOneElement.clear();
         addressLineOneElement.sendKeys(addressLineOne);
         return this;
     }
+
     @Step("Enter city: {city}")
     public CheckoutPage enterCity(String city) {
         //driver.findElement(billingCityFld).sendKeys(city);
@@ -85,8 +95,9 @@ public class CheckoutPage extends BasePage {
         cityElement.sendKeys(city);
         return this;
     }
+
     @Step("Select state: {stateName}")
-    public CheckoutPage selectState(String stateName){
+    public CheckoutPage selectState(String stateName) {
         //Select select = new Select(driver.findElement(stateDropDown));
        /* Select select = new Select(wait.until(ExpectedConditions.visibilityOfElementLocated(stateDropDown)));
         select.selectByVisibleText(stateName);*/
@@ -97,6 +108,7 @@ public class CheckoutPage extends BasePage {
         e.click();
         return this;
     }
+
     @Step("Enter postal code: {postCode}")
     public CheckoutPage enterPostCode(String postCode) {
         //driver.findElement(billingPostCodeFld).sendKeys(postCode);
@@ -105,16 +117,18 @@ public class CheckoutPage extends BasePage {
         postCodeElement.sendKeys(postCode);
         return this;
     }
+
     @Step("Enter email: {email}")
-    public CheckoutPage enterEmail(String email){
+    public CheckoutPage enterEmail(String email) {
         //driver.findElement(billingEmailFld).sendKeys(email);
         WebElement emailElement = wait.until(ExpectedConditions.visibilityOfElementLocated(billingEmailFld));
         emailElement.clear();
         emailElement.sendKeys(email);
         return this;
     }
+
     @Step("Set billing address")
-    public CheckoutPage setBillingAddress(BillingAddress billingAddress){
+    public CheckoutPage setBillingAddress(BillingAddress billingAddress) {
         return enterFirstName(billingAddress.getFirstName())
                 .enterLastName(billingAddress.getLastName())
                 .selectCountry(billingAddress.getCountry())
@@ -125,8 +139,9 @@ public class CheckoutPage extends BasePage {
                 .enterEmail(billingAddress.getEmail());
 
     }
+
     @Step("Place order")
-    public CheckoutPage placeOrder(){
+    public CheckoutPage placeOrder() {
         waitForOverlaysToDisappear(overlay);
         driver.findElement(placeOrderBtn).click();
         return this;
@@ -134,83 +149,93 @@ public class CheckoutPage extends BasePage {
 
 
     @Step("Read checkout notice")
-    public String getNotice(){
+    public String getNotice() {
         //return driver.findElement(successNotice).getText();
         return wait.until(ExpectedConditions.visibilityOfElementLocated(successNotice)).getText();
     }
+
     @Step("Click here to login link")
-    public CheckoutPage clickHereToLoginLink(){
+    public CheckoutPage clickHereToLoginLink() {
         //driver.findElement(clickHereToLoginLink).click();
         wait.until(ExpectedConditions.elementToBeClickable(clickHereToLoginLink)).click();
         return this;
     }
+
     @Step("Enter username")
-    public CheckoutPage enterUserName(String username){
+    public CheckoutPage enterUserName(String username) {
         //driver.findElement(usernameFld).sendKeys(username);
-       wait.until(ExpectedConditions.visibilityOfElementLocated(usernameFld)).sendKeys(username);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(usernameFld)).sendKeys(username);
         return this;
     }
+
     @Step("Enter password")
-    public CheckoutPage enterPassword(String password){
+    public CheckoutPage enterPassword(String password) {
         //driver.findElement(passwordFld).sendKeys(password);
         wait.until(ExpectedConditions.visibilityOfElementLocated(passwordFld)).sendKeys(password);
         return this;
     }
-    @Step("Click login button")
-    public CheckoutPage clickLoginBtn(){
-        //driver.findElement(loginBtn).click();
-        wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
-        return this;
-    }
-    private CheckoutPage waitForLoginBtnToDisappear(){
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(loginBtn));
-        return this;
-    }
-
-    //method chaining for functional convenience
-    @Step("Login with username and password")
-    public CheckoutPage login(String username, String password){
-        return
-               enterUserName(username).
-               enterPassword(password).
-                clickLoginBtn().waitForLoginBtnToDisappear();
-
-
-    }
-    @Step("Select Direct Bank Transfer payment method")
-    public CheckoutPage selectDirectBankTransfer(){
-        WebElement directBankTransferButton = wait.until(ExpectedConditions.elementToBeClickable(directBankTransferRadioBtn));
-        if (!directBankTransferButton.isSelected()){
-            directBankTransferButton.click();
+        @Step("Click login button")
+        public CheckoutPage clickLoginBtn () {
+            //driver.findElement(loginBtn).click();
+            wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
+            return this;
         }
-        return this;
-    }
-    @Step("Login with user object")
-    public CheckoutPage login(User user){
-        return
-                enterUserName(user.getUsername()).
-                        enterPassword(user.getPassword()).
-                        clickLoginBtn();
+        private CheckoutPage waitForLoginBtnToDisappear () {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(loginBtn));
+            return this;
+        }
+
+        //method chaining for functional convenience
+        @Step("Login with username and password")
+        public CheckoutPage login (String username, String password){
+            return
+                    enterUserName(username).
+                            enterPassword(password).
+                            clickLoginBtn().waitForLoginBtnToDisappear();
 
 
-    }
-    @Step("Read product name from checkout")
-    public String getProductName() {
-        int attempts = 5;
-
-        while (attempts > 0) {
-            try {
-                return wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(productName))
-                        .getText();
-
-            } catch (StaleElementReferenceException e) {
-                logger.debug("Retrying due to stale element: {}", e.getMessage());
+        }
+        @Step("Select Direct Bank Transfer payment method")
+        public CheckoutPage selectDirectBankTransfer () {
+            WebElement directBankTransferButton = wait.until(ExpectedConditions.elementToBeClickable(directBankTransferRadioBtn));
+            if (!directBankTransferButton.isSelected()) {
+                directBankTransferButton.click();
             }
-            attempts--;
+            return this;
+        }
+        @Step("Select Cash on Delivery payment method")
+    public CheckoutPage selectCashOnDeliveryTransfer(){
+        wait.until(ExpectedConditions.elementToBeClickable(cashOnDeliveryTransferRadioBtn)).click();
+        return this;
+    }
+        @Step("Login with user object")
+        public CheckoutPage login (User user){
+            return
+                    enterUserName(user.getUsername()).
+                            enterPassword(user.getPassword()).
+                            clickLoginBtn();
+            //using composition
+
+
+        }
+        @Step("Read product name from checkout")
+        public String getProductName () {
+            int attempts = 5;
+
+            while (attempts > 0) {
+                try {
+                    return wait.until(ExpectedConditions
+                                    .visibilityOfElementLocated(productName))
+                            .getText();
+
+                } catch (StaleElementReferenceException e) {
+                    logger.debug("Retrying due to stale element: {}", e.getMessage());
+                }
+                attempts--;
+            }
+
+            throw new RuntimeException("Product name element not found after retries");
         }
 
-        throw new RuntimeException("Product name element not found after retries");
     }
 
-}

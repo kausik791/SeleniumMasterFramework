@@ -2,6 +2,7 @@ package org.selenium.pom.tests;
 
 import io.qameta.allure.*;
 import io.qameta.allure.testng.Tag;
+import org.selenium.pom.api.actions.BillingApi;
 import org.selenium.pom.api.actions.CartApi;
 import org.selenium.pom.api.actions.SignupApi;
 import org.selenium.pom.base.BaseTest;
@@ -84,4 +85,64 @@ public class CheckoutTest extends BaseTest {
 
         Assert.assertEquals(checkoutPage.getNotice(), "Thank you. Your order has been received.");
     }
+    @Test
+    @Story("Registered user checkout with Cash on Delivery")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Create user via API, add product to cart, checkout using Cash on Delivery, and verify order success notice")
+    @Owner("kausik")
+    @Tag("smoke")
+    @Tag("regression")
+    @Tag("checkout")
+    @TmsLink("TC-202")
+    public void LoginAndCheckoutUsingCashOnDelivery() throws IOException, InterruptedException {
+        BillingAddress billingAddress = JacksonUtils.deserializeJson("myBillingAddress.json", BillingAddress.class);
+        String username = "demouser" + new FakerUtils().generateRandomNumber();
+        User user = new User(username, "demopwd", username + "@askomdch.com");
+
+        SignupApi signUpApi = new SignupApi();
+        signUpApi.register(user);
+        CartApi cartApi = new CartApi(signUpApi.getCookies());
+        Product product = new Product(1215);
+        cartApi.addToCart(product.getId(), 1);
+
+        CheckoutPage checkoutPage = new CheckoutPage(getDriver()).load();
+        injectCookiesToBrowser(signUpApi.getCookies());
+        checkoutPage.load();
+        checkoutPage.setBillingAddress(billingAddress).
+                selectCashOnDeliveryTransfer().
+                placeOrder();
+        Assert.assertEquals(checkoutPage.getNotice(), "Thank you. Your order has been received.");
+    }
+
+    @Test
+    @Story("Registered user checkout with Direct Bank Transfer and Billing Address")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Create user via API, add billing address using API, add product to cart, checkout using Direct Bank Transfer, and verify order success notice")
+    @Owner("kausik")
+    @Tag("smoke")
+    @Tag("regression")
+    @Tag("checkout")
+    @TmsLink("TC-202")
+    public void CheckoutWithAnAccountHavingABillingAddress() throws IOException {
+        BillingAddress billingAddress = JacksonUtils.deserializeJson("myBillingAddress.json", BillingAddress.class);
+        String username = "demouser" + new FakerUtils().generateRandomNumber();
+        User user = new User(username, "demopwd", username + "@askomdch.com");
+
+        SignupApi signUpApi = new SignupApi();
+        signUpApi.register(user);
+        BillingApi billingApi = new BillingApi(signUpApi.getCookies());
+        billingApi.addBillingAddress(billingAddress);
+
+        CartApi cartApi = new CartApi(signUpApi.getCookies());
+        Product product = new Product(1215);
+        cartApi.addToCart(product.getId(), 1);
+
+        CheckoutPage checkoutPage = new CheckoutPage(getDriver()).load();
+        injectCookiesToBrowser(signUpApi.getCookies());
+        checkoutPage.load();
+        checkoutPage.selectDirectBankTransfer().
+                placeOrder();
+        Assert.assertEquals(checkoutPage.getNotice(), "Thank you. Your order has been received.");
+    }
 }
+

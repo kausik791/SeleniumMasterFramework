@@ -9,11 +9,13 @@ public class BillingAddress {
     private String email;
     private String country;
     private String state;
+    private String company;
+    private String phone;
 
     public BillingAddress() {
     }
 
-    public BillingAddress(String firstName, String lastName, String addressLineOne, String city, String postalCode, String email, String country, String state) {
+    public BillingAddress(String firstName, String lastName, String addressLineOne, String city, String postalCode, String email, String country, String state, String company, String phone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.addressLineOne = addressLineOne;
@@ -22,6 +24,8 @@ public class BillingAddress {
         this.email = email;
         this.country = country;
         this.state = state;
+        this.company = company;
+        this.phone = phone;
     }
 
     public String getFirstName() {
@@ -93,6 +97,24 @@ public class BillingAddress {
 
     public BillingAddress setState(String state) {
         this.state = state;
+        return this;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public BillingAddress setCompany(String company) {
+        this.company = company;
+        return this;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public BillingAddress setPhone(String phone) {
+        this.phone = phone;
         return this;
     }
 }

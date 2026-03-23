@@ -13,6 +13,7 @@ import io.restassured.response.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.selenium.pom.constants.EndPoint;
 import org.selenium.pom.objects.User;
 import org.selenium.pom.utils.ConfigLoader;
 
@@ -42,21 +43,13 @@ public class SignupApi {
 
     @Step("API: Get account page")
     public Response getAccount() {
-        Response response = given().
-                baseUri(ConfigLoader.getInstance().getBaseUrl()).
-                //baseUri("https://askomdch.com").
-                //cookies(getCookies()).
-                        //log().all().
-                when().
-                get("/account").
-                then().
-                //log().all().
-                extract().response();
-        if (response.getStatusCode() != 200) {
+        Cookies cookies = new Cookies(); // Create an empty Cookies object to maintain session state and to maintain ApiRequest.get method signature consistency, even if we don't have any cookies to send in the request at this point.
+        Response response = ApiRequest.get(EndPoint.ACCOUNT.url, cookies);
+        if(response.getStatusCode() != 200){
             throw new RuntimeException("Failed to fetch the account, HTTP Status Code: " + response.getStatusCode());
         }
-
         return response;
+
     }
 
     @Step("API: Register user {user.username}")
@@ -64,24 +57,13 @@ public class SignupApi {
          Cookies cookies = new Cookies();
         Header header = new Header("content-type", "application/x-www-form-urlencoded");
         Headers headers = new Headers(header);
-        HashMap<String, String> formParams = new HashMap<>();
+        HashMap<String, Object> formParams = new HashMap<>();
         formParams.put("username", user.getUsername());
         formParams.put("email", user.getEmail());
         formParams.put("password", user.getPassword());
         formParams.put("woocommerce-register-nonce", fetchRegisterNonceValueUsingJsoup());
         formParams.put("register", "Register");
-        Response response = given().
-                baseUri(ConfigLoader.getInstance().getBaseUrl()).
-                headers(headers).
-                formParams(formParams).
-                cookies(cookies).
-                //log().all().
-                when().
-                post("/account").
-        then().
-                //log().all().
-                extract().
-                response();
+        Response response = ApiRequest.post(EndPoint.ACCOUNT.url, headers, formParams, cookies);
         if(response.getStatusCode() != 302){
             throw new RuntimeException("Failed to register the account, HTTP Status Code: " + response.getStatusCode());
         }

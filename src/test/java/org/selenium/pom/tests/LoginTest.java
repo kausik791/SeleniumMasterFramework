@@ -7,9 +7,8 @@ import org.selenium.pom.api.actions.SignupApi;
 import org.selenium.pom.base.BaseTest;
 import org.selenium.pom.objects.Product;
 import org.selenium.pom.objects.User;
-import org.selenium.pom.pages.CartPage;
 import org.selenium.pom.pages.CheckoutPage;
-import org.selenium.pom.utils.ConfigLoader;
+import org.selenium.pom.pages.AccountPage;
 import org.selenium.pom.utils.FakerUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -91,5 +90,45 @@ public class LoginTest extends BaseTest {
                    //login(user);
         Assert.assertTrue(checkoutPage.getProductName().contains(product.getName()));
 
+    }
+    @Test
+    @Story("Already Registered user tries to login with invalid password")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("qa-team")
+    @Description("User registers, tries to login with invalid password, and sees correct error message")
+    @Tag("smoke")
+    @Tag("regression")
+    @Tag("login")
+    @TmsLink("TC-304")
+    public void shouldNotLoginWithAnInvalidPassword(){
+        String username = "demouser" + new FakerUtils().generateRandomNumber();
+        User user = new User().setUsername(username).
+                setPassword("demopwd").setEmail(username+"@askomdch.com");
+
+        new SignupApi().register(user);
+
+        AccountPage accountPage = new AccountPage(getDriver()).load();
+        accountPage.login(user.getUsername(), "invalidPassword");
+        Assert.assertEquals(accountPage.getErrorTxt(), "Error: The password you entered for the username "
+                + user.getUsername() + " is incorrect. Lost your password?");
+    }
+    @Test
+    @Story("Non Registered user tries to login with non existing username in the system")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("qa-team")
+    @Description("User tries to login with non existing username and sees correct error message")
+    @Tag("smoke")
+    @Tag("regression")
+    @Tag("login")
+    @TmsLink("TC-304")
+    public void shouldNotLoginWithANonExistingUser(){
+        String username = "demouser" + new FakerUtils().generateRandomNumber();
+        User user = new User(username, "demopwd");
+
+        AccountPage accountPage = new AccountPage(getDriver()).load();
+        accountPage.login(user.getUsername(), "demopwd");
+        Assert.assertEquals(accountPage.getErrorTxt(), "Error: The username " + user.getUsername() +
+                " is not registered on this site." +
+                " If you are unsure of your username, try your email address instead.");
     }
 }

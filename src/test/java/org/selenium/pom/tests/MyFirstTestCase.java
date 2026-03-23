@@ -80,10 +80,10 @@ public class MyFirstTestCase extends BaseTest {
     }
 
    //@Test
-    public void loginAndCheckoutUsingDirectBankTransfer() throws IOException {
+    public void loginAndCheckoutUsingDirectBankTransfer() throws IOException, InterruptedException {
         //driver.get("https://askomdch.com/");
         //using constructor initialization
-        BillingAddress billingAddress = new BillingAddress("demo", "user", "San francisco", "San francisco", "400069", "demo@example.com", "India", "Maharashtra");
+        BillingAddress billingAddress = new BillingAddress("demo", "user", "San francisco", "San francisco", "400069", "demo@example.com", "India", "Maharashtra","123 Main St","3363636");
         String searchFor = "Blue";
         BillingAddress billingAddressDesrialize = JacksonUtils.deserializeJson("myBillingAddress.json", BillingAddress.class);
         Product product = new Product(1215);
@@ -111,6 +111,7 @@ public class MyFirstTestCase extends BaseTest {
         /*checkout.
                 login("babu@mymail.com", "test1234");*/
         checkout.login(user);
+        Thread.sleep(5000);
 
        /* checkout.
                 enterFirstName("demo").

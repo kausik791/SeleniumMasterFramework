@@ -3,5 +3,6 @@
 
 - ## Agent Instructions
 
-When analyzing project structure:
-suggest if have to use remotedriver for selenium grid with docker then what i have to do,keeping in mind local set up should not be affected
+When analyzing project  
+suggest if my project is industry standard or not, and if not, suggest improvements to make it more standard.
+
