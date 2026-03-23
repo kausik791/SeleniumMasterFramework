@@ -53,10 +53,16 @@ public class ConfigLoader {
     }
 
     public String getGridUrl() {
+        String sysProp = System.getProperty("gridUrl");
+        if (sysProp != null && !sysProp.trim().isEmpty()) {
+            return sysProp.trim();
+        }
+
         String prop = properties.getProperty("gridUrl");
         if (prop != null && !prop.trim().isEmpty()) {
             return prop.trim();
         }
-        return System.getProperty("gridUrl", "http://localhost:4444");
+
+        return "http://localhost:4444";
     }
 }
