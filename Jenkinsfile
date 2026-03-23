@@ -87,7 +87,7 @@ pipeline {
              steps {
                  echo 'Waiting for Selenium Grid to be ready...'
                  script {
-                     int maxRetries = 36   // ~6 minutes (36 * 10s)
+                     int maxRetries = 10   // ~6 minutes (36 * 10s)
                      int retry = 0
                      boolean ready = false
 
