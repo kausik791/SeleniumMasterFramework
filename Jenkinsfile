@@ -79,7 +79,14 @@ pipeline {
              steps {
                  echo 'Starting Selenium Grid...'
                  bat 'docker compose down --timeout 5 || exit 0'
-                 bat 'docker rm -f selenium-hub javaseleniumpipeline-chrome-1 javaseleniumpipeline-chrome-2 javaseleniumpipeline-firefox-1 javaseleniumpipeline-firefox-2 || exit 0'
+                 bat '''
+                     for /f "tokens=*" %%i in ('docker ps -aq --filter "name=javaseleniumpipeline"') do (
+                         docker kill --signal=9 %%i 2>nul
+                         docker rm -f %%i 2>nul
+                     )
+                     exit /b 0
+                 '''
+                 bat 'docker rm -f selenium-hub || exit 0'
                  bat 'docker network rm javaseleniumpipeline_selenium-grid || exit 0'
                  bat 'docker compose up -d --scale chrome=2 --scale firefox=2'
              }
@@ -148,7 +155,14 @@ pipeline {
 
              echo 'Stopping Selenium Grid...'
              bat 'docker compose down --timeout 5 || exit 0'
-             bat 'docker rm -f selenium-hub javaseleniumpipeline-chrome-1 javaseleniumpipeline-chrome-2 javaseleniumpipeline-firefox-1 javaseleniumpipeline-firefox-2 || exit 0'
+             bat '''
+                 for /f "tokens=*" %%i in ('docker ps -aq --filter "name=javaseleniumpipeline"') do (
+                     docker kill --signal=9 %%i 2>nul
+                     docker rm -f %%i 2>nul
+                 )
+                 exit /b 0
+             '''
+             bat 'docker rm -f selenium-hub || exit 0'
              bat 'docker network rm javaseleniumpipeline_selenium-grid || exit 0'
          }
 
