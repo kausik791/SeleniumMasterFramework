@@ -58,7 +58,7 @@ pipeline {
 
      options {
          skipDefaultCheckout(true)
-         timeout(time: 20, unit: 'MINUTES')
+         timeout(time: 30, unit: 'MINUTES')
      }
 
      tools {
@@ -78,6 +78,7 @@ pipeline {
          stage('Start Selenium Grid') {
              steps {
                  echo 'Starting Selenium Grid...'
+                 bat 'docker compose down || exit 0'
                  bat 'docker compose up -d --scale chrome=2 --scale firefox=2'
              }
          }
@@ -85,38 +86,39 @@ pipeline {
          stage('Wait for Grid') {
              steps {
                  echo 'Waiting for Selenium Grid to be ready...'
-
                  script {
-                     def isReady = false
+                     int maxRetries = 36   // ~6 minutes (36 * 10s)
                      int retry = 0
+                     boolean ready = false
 
-                     while (!isReady && retry < 20) {
-                         try {
-                             def response = bat(
-                                 script: 'curl -s http://localhost:4444/status',
-                                 returnStdout: true
-                             ).trim()
+                     while (!ready && retry < maxRetries) {
+                         int status = bat(
+                             returnStatus: true,
+                             script: '''
+powershell -NoProfile -Command ^
+"$ErrorActionPreference='Stop'; ^
+try { ^
+  $r = Invoke-RestMethod -Uri 'http://localhost:4444/status' -TimeoutSec 5; ^
+  if ($r.value.ready -eq $true) { exit 0 } else { exit 2 } ^
+} catch { exit 1 }"
+'''
+                         )
 
-                             echo "Grid response: ${response}"
-
-                             if (response.toLowerCase().contains("ready")) {
-                                 isReady = true
-                                 echo 'Selenium Grid is READY ✅'
-                             } else {
-                                 echo "Grid not ready yet... retry ${retry}"
-                                 sleep time: 5, unit: 'SECONDS'
-                                 retry++
-                             }
-
-                         } catch (Exception e) {
-                             echo "Grid not reachable yet... retry ${retry}"
-                             sleep time: 5, unit: 'SECONDS'
+                         if (status == 0) {
+                             echo "Selenium Grid is READY on retry ${retry + 1}"
+                             ready = true
+                         } else {
+                             echo "Grid not ready (status=${status}) retry ${retry + 1}/${maxRetries}"
+                             sleep time: 10, unit: 'SECONDS'
                              retry++
                          }
                      }
 
-                     if (!isReady) {
-                         error("❌ Selenium Grid did not become ready in time")
+                     if (!ready) {
+                         echo 'Grid failed to become ready. Dumping diagnostics...'
+                         bat 'docker compose ps'
+                         bat 'docker compose logs selenium-hub --tail=200'
+                         error('Selenium Grid did not become ready in time')
                      }
                  }
              }
@@ -131,7 +133,7 @@ pipeline {
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-                 bat 'mvn test -Dgrid=true'
+                 bat 'mvn test -Dgrid=true -Denv=STAGE'
              }
          }
      }
@@ -139,7 +141,6 @@ pipeline {
      post {
          always {
              echo 'Generating Allure Report...'
-
              allure includeProperties: true,
                     jdk: '',
                     results: [[path: 'target/allure-results']]
