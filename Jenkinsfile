@@ -87,7 +87,7 @@ pipeline {
              steps {
                  echo 'Waiting for Selenium Grid to be ready...'
                  script {
-                     int maxRetries = 10   // ~6 minutes (36 * 10s)
+                     int maxRetries = 36   // ~6 minutes (36 * 10s)
                      int retry = 0
                      boolean ready = false
 
@@ -97,10 +97,8 @@ pipeline {
                              script: '''
 powershell -NoProfile -Command ^
 "$ErrorActionPreference='Stop'; ^
-try { ^
-  $r = Invoke-RestMethod -Uri 'http://localhost:4444/status' -TimeoutSec 5; ^
-  if ($r.value.ready -eq $true) { exit 0 } else { exit 2 } ^
-} catch { exit 1 }"
+$logs = docker compose logs selenium-hub --tail=200 | Out-String; ^
+if (($logs -match 'Started Selenium Hub') -and ($logs -match 'from DOWN to UP')) { exit 0 } else { exit 1 }"
 '''
                          )
 
@@ -133,7 +131,7 @@ try { ^
          stage('Run Tests (Grid + Parallel)') {
              steps {
                  bat 'if not exist target\\allure-results mkdir target\\allure-results'
-                 bat 'mvn test -Dgrid=true -Denv=STAGE'
+                 bat 'docker run --rm --network javaseleniumpipeline_default -v "%cd%":/workspace -w /workspace -v "%USERPROFILE%\\\\.m2":/root/.m2 maven:3.9.9-eclipse-temurin-21 mvn -B clean test -Dgrid=true -Denv=STAGE -DgridUrl=http://selenium-hub:4444'
              }
          }
      }
